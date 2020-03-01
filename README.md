@@ -93,7 +93,7 @@ a) Utiliser la fonction de déauthentification de la suite aircrack, capturer le
 
 __Question__ : quel code est utilisé par aircrack pour déauthentifier un client 802.11. Quelle est son interpretation ?
 
-___Réponse___ : Le reason code 3 est généré par aircrack-ng. Il signifie "station is leaving (or has left) IBSS or ESS".
+___Réponse___ : Le reason code 3 est généré par aircrack-ng. Il signifie "station is leaving (or has left) IBSS or ESS". Il indique une désauthentification entre la STA et l'AP.
 
 ![](./images/reason_code_airoplay.png)
 
@@ -133,6 +133,7 @@ Si les identifiants correspondent, le processus est complété et l'utilisateur 
 La seconde étape est la phase d'association dans laquelle la STA et l'AP vont se mettre d'accord sur les paramètrages techniques pour pouvoir communiquer au mieux. Par exemple, le canal de communication, la vitesse de transfert des données, etc.
 
 __Question__ : Expliquer l'effet de cette attaque sur la cible
+
 __Réponse__ : Cette permet de ralentir voir stopper complétement les communications entre une/des STA et un AP. C'est une attaque de type "Deny of Service".
 
 ### 2. Fake channel evil tween attack
