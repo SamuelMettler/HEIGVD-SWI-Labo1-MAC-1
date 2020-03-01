@@ -88,12 +88,20 @@ Le corps de la trame (Frame body) contient, entre autres, un champ de deux octet
 | 39 | Requested from peer QSTA due to timeout                                                                                                                                              |
 | 40 | Peer QSTA does not support the requested cipher suite                                                                                                                                              |
 | 46-65535 | Reserved                                                                                                                                              |
- 
+
 a) Utiliser la fonction de déauthentification de la suite aircrack, capturer les échanges et identifier le Reason code et son interpretation.
 
 __Question__ : quel code est utilisé par aircrack pour déauthentifier un client 802.11. Quelle est son interpretation ?
 
+___Réponse___ : Le reason code 3 est généré par aircrack-ng. Il signifie "station is leaving (or has left) IBSS or ESS".
+
+![](./images/reason_code_airoplay.png)
+
 __Question__ : A l'aide d'un filtre d'affichage, essayer de trouver d'autres trames de déauthentification dans votre capture. Avez-vous en trouvé d'autres ? Si oui, quel code contient-elle et quelle est son interpretation ?
+
+___Réponse___ : Pas trouvé d'autres trames de déauthentification.
+
+![](./images/deauth_filter.png)
 
 b) Développer un script en Python/Scapy capable de générer et envoyer des trames de déauthentification. Le script donne le choix entre des Reason codes différents (liste ci-après) et doit pouvoir déduire si le message doit être envoyé à la STA ou à l'AP :
 * 1 - Unspecified
@@ -103,13 +111,29 @@ b) Développer un script en Python/Scapy capable de générer et envoyer des tra
 
 __Question__ : quels codes/raisons justifient l'envoie de la trame à la STA cible et pourquoi ?
 
+__Réponse__ : Le code 5, car il fait croire à la STA que l'AP est débordé et ne peut donc pas s'associer avec la STA pour l'instant.
+
 __Question__ : quels codes/raisons justifient l'envoie de la trame à l'AP et pourquoi ?
+
+__Réponse__ : Le code 4 car il fait croire à l'AP que la STA est inactive depuis un moment et donc il faut la déconnecter.
 
 __Question__ : Comment essayer de déauthentifier toutes les STA ?
 
+__Réponse__ : Utiliser l'adresse MAC de broadcast comme cible pour envoyer les trames à toutes les STA accessibles.
+
 __Question__ : Quelle est la différence entre le code 3 et le code 8 de la liste ?
 
+__Réponse__ : Le code 3 indique une déauthentification tandis que le code 8 indique une désassociation.
+
+Pour rappel, lorsqu'une STA veut se connecter à une AP, le processus se fait en deux étapes.<br/>
+Tout d'abord, la phase d'authentification dans laquelle la STA transmet les identifiants fournis par l'utilisateur à l'AP.<br/>
+L'AP les comparent avec les identifiants stockés dans la base de donnée local du routeur ou à travers d'un serveur d'authentification.<br/>
+Si les identifiants correspondent, le processus est complété et l'utilisateur obtient les droits d'accès aux communications avec l'AP.
+
+La seconde étape est la phase d'association dans laquelle la STA et l'AP vont se mettre d'accord sur les paramètrages techniques pour pouvoir communiquer au mieux. Par exemple, le canal de communication, la vitesse de transfert des données, etc.
+
 __Question__ : Expliquer l'effet de cette attaque sur la cible
+__Réponse__ : Cette permet de ralentir voir stopper complétement les communications entre une/des STA et un AP. C'est une attaque de type "Deny of Service".
 
 ### 2. Fake channel evil tween attack
 a)	Développer un script en Python/Scapy avec les fonctionnalités suivantes :

