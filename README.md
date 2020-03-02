@@ -93,15 +93,19 @@ a) Utiliser la fonction de déauthentification de la suite aircrack, capturer le
 
 __Question__ : quel code est utilisé par aircrack pour déauthentifier un client 802.11. Quelle est son interpretation ?
 
-___Réponse___ : Le reason code 3 est généré par aircrack-ng. Il signifie "station is leaving (or has left) IBSS or ESS". Il indique une désauthentification entre la STA et l'AP.
+___Réponse___ : Le reason code 7 est généré par aircrack-ng. Il signifie "Class 3 frame received from nonassociated station".
 
 ![](./images/reason_code_airoplay.png)
 
 __Question__ : A l'aide d'un filtre d'affichage, essayer de trouver d'autres trames de déauthentification dans votre capture. Avez-vous en trouvé d'autres ? Si oui, quel code contient-elle et quelle est son interpretation ?
 
-___Réponse___ : Pas trouvé d'autres trames de déauthentification.
+___Réponse___ : Nous avons trouvé des trames avec les codes : 
+1  : Unspecified
+3  : station is leaving (or has left) IBSS or ESS
+6  : Class 2 frame received from nonauthenticated station
+f (15) : 4-Way Handshake timeout
 
-![](./images/deauth_filter.png)
+![](./images/deauthMultiRC.png)
 
 b) Développer un script en Python/Scapy capable de générer et envoyer des trames de déauthentification. Le script donne le choix entre des Reason codes différents (liste ci-après) et doit pouvoir déduire si le message doit être envoyé à la STA ou à l'AP :
 * 1 - Unspecified
