@@ -99,7 +99,7 @@ ___Réponse___ : Le reason code 7 est généré par aircrack-ng. Il signifie "Cl
 
 __Question__ : A l'aide d'un filtre d'affichage, essayer de trouver d'autres trames de déauthentification dans votre capture. Avez-vous en trouvé d'autres ? Si oui, quel code contient-elle et quelle est son interpretation ?
 
-___Réponse___ : Nous avons trouvé des trames avec les codes : 
+___Réponse___ : Nous avons trouvé des trames avec les codes :
 1  : Unspecified
 3  : station is leaving (or has left) IBSS or ESS
 6  : Class 2 frame received from nonauthenticated station
@@ -115,15 +115,15 @@ b) Développer un script en Python/Scapy capable de générer et envoyer des tra
 
 __Question__ : quels codes/raisons justifient l'envoie de la trame à la STA cible et pourquoi ?
 
-__Réponse__ : Le code 5, car il fait croire à la STA que l'AP est débordé et ne peut donc pas s'associer avec la STA pour l'instant.
+__Réponse__ : Le code 5, car il fait croire à la STA que l'AP est débordé et ne peut donc pas s'associer avec la STA pour l'instant. Le code 1 justifie l'envoie de la trame pour n'importe quelle destination.
 
 __Question__ : quels codes/raisons justifient l'envoie de la trame à l'AP et pourquoi ?
 
-__Réponse__ : Le code 4 car il fait croire à l'AP que la STA est inactive depuis un moment et donc il faut la déconnecter.
+__Réponse__ : Le code 4 car il fait croire à l'AP que la STA est inactive depuis un moment et donc il faut la déconnecter. Le code 8 car il fait croire à l'AP que la STA est entrin de quitter le BSS.
 
 __Question__ : Comment essayer de déauthentifier toutes les STA ?
 
-__Réponse__ : Utiliser l'adresse MAC de broadcast comme cible pour envoyer les trames à toutes les STA accessibles.
+__Réponse__ : Utiliser l'adresse MAC de broadcast comme cible (dans la commande aireplay-ng) pour envoyer les trames de déauthentification à toutes les STA accessibles.
 
 __Question__ : Quelle est la différence entre le code 3 et le code 8 de la liste ?
 
@@ -150,6 +150,7 @@ a)	Développer un script en Python/Scapy avec les fonctionnalités suivantes :
 
 __Question__ : Expliquer l'effet de cette attaque sur la cible
 
+__Réponse__ : Cela aura comme effet de forcer les STA connectée au réseau à essayer de changer de canal pour communiquer. L'AP légitime n'étant pas sur ce canal, va lui à son tour envoyer des beacon indiquant le bon canal. Cette attaque lancée en continue peut mener à un DoS des appareils connectés au réseau. Cette attaque peut aussi être utilisée pour récupérer des handshakes utilisés ensuite pour d'autres attaques.
 
 ### 3. SSID flood attack
 
