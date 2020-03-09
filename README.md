@@ -93,17 +93,17 @@ a) Utiliser la fonction de déauthentification de la suite aircrack, capturer le
 
 __Question__ : quel code est utilisé par aircrack pour déauthentifier un client 802.11. Quelle est son interpretation ?
 
-___Réponse___ : Le reason code 7 est généré par aircrack-ng. Il signifie "Class 3 frame received from nonassociated station".
+___Réponse___ : Le reason code 7 ("Class 3 frame received from nonassociated station") est généré par aircrack-ng. Ce reason code peut être envoyé à une STA depuis un AP lorsque, par exemple, un client (STA) tente de transmettre des paquets (layer 3) avant d'être associé avec l'AP (mais déjà authentifié).
 
 ![](./images/reason_code_airoplay.png)
 
 __Question__ : A l'aide d'un filtre d'affichage, essayer de trouver d'autres trames de déauthentification dans votre capture. Avez-vous en trouvé d'autres ? Si oui, quel code contient-elle et quelle est son interpretation ?
 
-___Réponse___ : Nous avons trouvé des trames avec les codes :
-1  : Unspecified
-3  : station is leaving (or has left) IBSS or ESS
-6  : Class 2 frame received from nonauthenticated station
-f (15) : 4-Way Handshake timeout
+___Réponse___ : Nous avons trouvé des trames avec les codes :<br/>
+1 (Unspecified): Ce reason code peut être utilisé pour n'importe quelle raison de déauthentification.<br/>
+3 (Station is leaving (or has left) IBSS or ESS): Ce reason code est envoyé depuis une STA à un AP pour indiquer à l'AP que la STA est entrain de se déauthentifier (ou s'est déauthentifié) de l'AP. Cela peut arriver lorsqu'on désactive le wifi de notre téléphone par exemple.<br/>
+6 (Class 2 frame received from nonauthenticated station) : Ce reason code ressemble fortement à la description du reason code 7 à la différence près que, pour celui-ci, la STA tente de transmettre une trame (layer 2) à l'AP alors qu'elle n'est pas authentifiée avec l'AP.<br/>
+f (4-Way Handshake timeout): Ce reason code peut être envoyé depuis/aux deux parties (STA ou AP) pour indiquer un handshake qui ne s'est jamais terminé.<br/>
 
 ![](./images/deauthMultiRC.png)
 
@@ -113,17 +113,29 @@ b) Développer un script en Python/Scapy capable de générer et envoyer des tra
 * 5 - Disassociated because AP is unable to handle all currently associated stations
 * 8 - Deauthenticated because sending STA is leaving BSS
 
+Afin de vérifier la connectivité de la cible, nous avons exécuté un ping en continue dans un terminal pendant l'attaque. Voici le résultat :
+
+
+![](./images/pings2.png)
+
 __Question__ : quels codes/raisons justifient l'envoie de la trame à la STA cible et pourquoi ?
 
-__Réponse__ : Le code 5, car il fait croire à la STA que l'AP est débordé et ne peut donc pas s'associer avec la STA pour l'instant. Le code 1 justifie l'envoie de la trame pour n'importe quelle destination.
+__Réponse__ :
+
+Le code 1: Comme expliqué plus haut, ce reason code peut être utilisé pour justifier n'importe quel problème et peut être envoyé autant depuis l'AP que depuis la STA.<br/>
+Le code 5: Ce reason code est envoyé depuis une AP à une STA pour lui indiquer qu'il est saturé et ne peut donc pas s'associer avec la STA pour l'instant.
 
 __Question__ : quels codes/raisons justifient l'envoie de la trame à l'AP et pourquoi ?
 
-__Réponse__ : Le code 4 car il fait croire à l'AP que la STA est inactive depuis un moment et donc il faut la déconnecter. Le code 8 car il fait croire à l'AP que la STA est entrin de quitter le BSS.
+__Réponse__ :
+
+Le code 1: Comme expliqué plus haut, ce reason code peut être utilisé pour justifier n'importe quel problème et peut être envoyé autant depuis l'AP que depuis la STA.<br/>
+Le code 4: Ce reason code est envoyé depuis une STA à un AP pour informer l'AP qu'elle n'est plus accessible (timeout). Ce genre de situation peut arriver si, par exemple, on s'éloigne trop d'une AP avec son téléphone mobile et qu'on ne reçoit plus de données.<br/>
+Le code 8: Ce reason code est envoyé depuis une STA à un AP pour lui indiquer qu'elle quitte la BSS actuelle, c'est à dire qu'elle change d'AP sans forcément changer d' IBSS/ESS (sans changer de réseau).
 
 __Question__ : Comment essayer de déauthentifier toutes les STA ?
 
-__Réponse__ : Utiliser l'adresse MAC de broadcast comme cible (dans la commande aireplay-ng) pour envoyer les trames de déauthentification à toutes les STA accessibles.
+__Réponse__ : Avec Aircrack, Il est possible d'utiliser l'adresse MAC de broadcast comme cible (dans la commande aireplay-ng) pour envoyer les trames de déauthentification à toutes les STA authentifiées ou associées avec un AP.
 
 __Question__ : Quelle est la différence entre le code 3 et le code 8 de la liste ?
 
@@ -136,9 +148,11 @@ Si les identifiants correspondent, le processus est complété et l'utilisateur 
 
 La seconde étape est la phase d'association dans laquelle la STA et l'AP vont se mettre d'accord sur les paramètrages techniques pour pouvoir communiquer au mieux. Par exemple, le canal de communication, la vitesse de transfert des données, etc.
 
+Finalement, un reason code 3 sera utilisé lorsqu'un une STA quitte le réseau, par exemple, désactivation du wifi sur un téléphone mobile. un reason code 8 sera utilisé lorsqu'une STA change d'AP en restant sur connecté au même réseau par exemple.
+
 __Question__ : Expliquer l'effet de cette attaque sur la cible
 
-__Réponse__ : Cette permet de ralentir voir stopper complétement les communications entre une/des STA et un AP. C'est une attaque de type "Deny of Service".
+__Réponse__ : Cette permet de ralentir voir stopper complétement les communications entre une/des STA et un AP en faisant croire aux deux parties que les appareils souhaitent se déauthentifier. C'est une attaque de type "Deny of Service". Cette attaque peut aussi être utilisée pour récupérer des handshakes utiles pour d'autres attaques.
 
 ### 2. Fake channel evil tween attack
 a)	Développer un script en Python/Scapy avec les fonctionnalités suivantes :
@@ -150,7 +164,7 @@ a)	Développer un script en Python/Scapy avec les fonctionnalités suivantes :
 
 __Question__ : Expliquer l'effet de cette attaque sur la cible
 
-__Réponse__ : Cela aura comme effet de forcer les STA connectée au réseau à essayer de changer de canal pour communiquer. L'AP légitime n'étant pas sur ce canal, va lui à son tour envoyer des beacon indiquant le bon canal. Cette attaque lancée en continue peut mener à un DoS des appareils connectés au réseau. Cette attaque peut aussi être utilisée pour récupérer des handshakes utilisés ensuite pour d'autres attaques.
+__Réponse__ : Cela aura comme effet de forcer les STA connectée au réseau à essayer de changer de canal pour communiquer. L'AP légitime n'étant pas sur ce canal, va à son tour, envoyer des beacons indiquant le bon canal. Cette attaque lancée en continue peut mener à un DoS des appareils connectés au réseau.
 
 ### 3. SSID flood attack
 
