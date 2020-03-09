@@ -23,7 +23,7 @@ args = parser.parse_args()
 if not (args.Filename or args.Interface) :
 	parser.error('No file or number provided, use either -n or -f')
 
-listSSID = []
+listSSID = [] # 2 ways of filling listSSID : either with a provided list or with randomly generated name
 if(args.Filename):
 	f = open(args.Filename, 'r')
 	listSSID = f.readlines()
@@ -37,18 +37,14 @@ frame = []
 
 
 for i in listSSID:
-	print(i)
-	randMac = RandMAC()
-	dot11 = Dot11(type=0, subtype=8, addr1='ff:ff:ff:ff:ff:ff',  
-	addr2=randMac, addr3=randMac)
+	print(i) 														#print the SSID so the user knows which wifi has been created
+	randMac = RandMAC()												#generate a random mac address for each wifi
+	dot11 = Dot11(type=0, subtype=8, addr1='ff:ff:ff:ff:ff:ff',  	#addr1 : destination MAC address, in this case broadcast. addr2 : Source MAC address of the sender. 
+	addr2=randMac, addr3=randMac)									#addr3 : MAC address of the AP
 	beacon = Dot11Beacon(cap='ESS+privacy')
-	essid = Dot11Elt(ID='SSID',info=i, len=len(i))
+	essid = Dot11Elt(ID='SSID',info=i, len=len(i))					#adding information relative to the wifi : SSID
 	
-	newf = RadioTap()/dot11/beacon/essid
-	frame.append(newf)
+	newf = RadioTap()/dot11/beacon/essid							#concatenate everything
+	frame.append(newf)												#add the constructed frame to the table of frames
 
-#frame.show()
-#print("\nHexdump of frame:")
-#hexdump(frame)
-
-sendp(frame, iface=iface, inter=0.0000000001, loop=1)
+sendp(frame, iface=iface, inter=0.0000000001, loop=1)				#send all frames inside the table frame with a really low inter to be sure that the signal will be constant.

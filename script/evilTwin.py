@@ -88,7 +88,9 @@ if __name__ == "__main__":
     # interface name, check using iwconfig and pass it with -i argument
     interface = args.Interface    
 
-    # start the channel changer
+    # the channel changer has been taken from : https://www.thepythoncode.com/code/building-wifi-scanner-in-python-scapy
+    # the callback function has been inspired by it as well
+    # start the channel changer 
     channel_changer = Thread(target=change_channel)
     channel_changer.daemon = True
     channel_changer.start()
